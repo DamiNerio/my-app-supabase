@@ -29,7 +29,7 @@
     <form id="student-form">
         <input type="text" id="nombre" placeholder="Nombre completo" required>
         
-        <!-- Cambiamos el select por un input de texto libre -->
+        
         <input type="text" id="carrera" placeholder="Carrera (ej. ITS, IMTC, IEA)" required>
         
         <button type="submit">Guardar en Base de Datos</button>
@@ -39,7 +39,7 @@
     <script>
    
       
-// Pero para evitar conflictos, usamos el nombre completo del objeto global
+
 const { createClient } = supabase; 
 
 const supabaseUrl = 'https://vyejudhgyrlqkcljjaaq.supabase.co';
@@ -48,7 +48,6 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-// --- FUNCIONES DE AUTENTICACIÓN ---
 async function signUp() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
