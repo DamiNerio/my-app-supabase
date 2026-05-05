@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro FIME - Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        form { background: #f4f4f4; padding: 20px; border-radius: 8px; width: 300px; margin-bottom: 20px; }
+        input, select, button { width: 100%; margin-top: 10px; padding: 8px; box-sizing: border-box; }
+        button { background: #003366; color: white; border: none; cursor: pointer; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="auth-section">
+        <h2>Acceso Alumnos FIME</h2>
+        <form id="login-form">
+            <input type="email" id="email" placeholder="Correo electrónico" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button type="button" onclick="signUp()">Registrarse</button>
+            <button type="button" onclick="signIn()">Iniciar Sesión</button>
+        </form>
+    </div>
+
+    <div id="data-section" class="hidden">
+    <h2>Registro de Alumno</h2>
+    <form id="student-form">
+        <input type="text" id="nombre" placeholder="Nombre completo" required>
+        
+        <!-- Cambiamos el select por un input de texto libre -->
+        <input type="text" id="carrera" placeholder="Carrera (ej. ITS, IMTC, IEA)" required>
+        
+        <button type="submit">Guardar en Base de Datos</button>
+    </form>
+    <button onclick="signOut()" style="background: #990000; margin-top: 20px;">Cerrar Sesión</button>
+    </div>
+    <script>
+   
+      
+// Pero para evitar conflictos, usamos el nombre completo del objeto global
+const { createClient } = supabase; 
+
+const supabaseUrl = 'https://vyejudhgyrlqkcljjaaq.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ5ZWp1ZGhneXJscWtjbGpqYWFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTk5OTUsImV4cCI6MjA5MzQ5NTk5NX0.lwn8hpQddi5IDunE_ut81b-hagVcyJgjv__3qtcEfto'; 
+
+
+const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+// --- FUNCIONES DE AUTENTICACIÓN ---
+async function signUp() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    console.log("Intentando registro..."); 
+    
+    const { data, error } = await supabaseClient.auth.signUp({ 
+        email: email, 
+        password: password 
+    });
+
+    if (error) {
+        alert("Error: " + error.message);
+    } else {
+        alert("¡Registro exitoso! Revisa tu correo de confirmación.");
+    }
+}
+
+async function signIn() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    console.log("Intentando inicio de sesión...");
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ 
+        email: email, 
+        password: password 
+    });
+    
+    if (error) {
+        alert("Error: " + error.message);
+    } else if (data.user) {
+        alert("Bienvenido, " + data.user.email);
+        toggleView(true);
+    }
+}
+
+async function signOut() {
+    await supabaseClient.auth.signOut();
+    toggleView(false);
+}
+
+function toggleView(isLoggedIn) {
+    document.getElementById('auth-section').classList.toggle('hidden', isLoggedIn);
+    document.getElementById('data-section').classList.toggle('hidden', !isLoggedIn);
+}
+
+
+document.getElementById('student-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('nombre').value;
+    const carrera = document.getElementById('carrera').value;
+
+    const { data, error } = await supabaseClient
+        .from('estudiantes')
+        .insert([{ nombre, carrera }]);
+
+    if (error) {
+        alert("Error al guardar: " + error.message);
+    } else {
+        alert("Alumno de FIME registrado con éxito");
+        document.getElementById('student-form').reset();
+    }
+});
+    </script>
+</body>
+</html>

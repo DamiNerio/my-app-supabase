@@ -15,3 +15,27 @@ async function obtenerEstudiantes() {
 
 
 obtenerEstudiantes()
+
+async function insertarEstudiante(nombre, carrera, matricula) {
+  const { data, error } = await supabase
+    .from('estudiantes')
+    .insert([
+      { 
+        nombre: nombre, 
+        carrera: carrera, 
+      }
+    ])
+    .select()
+if (error) {
+    console.log('Error al insertar:', error)
+  } else {
+    console.log('Estudiante insertado con éxito:', data)
+  }
+}
+
+async function main() {
+  await insertarEstudiante('Cesar Nerio', 'ITS')
+  await obtenerEstudiantes()
+}
+
+main()
